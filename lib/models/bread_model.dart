@@ -1,43 +1,33 @@
 class BreadModel {
-  int id;
-  String name;
-  String baker; // Panadero/horneador (antes "developer")
-  String type; // Tipo de pan (antes "genre")
-  String imageLink;
-  String description;
-  double price;
+  final int? id;
+  final String nombre;
+  final int idTipo;
+  final double precio;
+  final String? tipoNombre; // <- nombre del tipo (opcional)
 
-  BreadModel({
-    required this.id,
-    required this.name,
-    required this.baker,
-    required this.type,
-    required this.imageLink,
-    required this.description,
-    required this.price,
-  });
 
-  factory BreadModel.fromJSON(Map<String, dynamic> json) {
-    return BreadModel(
+BreadModel({
+  this.id,
+  required this.nombre,
+  required this.idTipo,
+  required this.precio,
+  this.tipoNombre,
+});
+
+
+  factory BreadModel.fromMap(Map<String, dynamic> json) => BreadModel(
       id: json['id'],
-      name: json['name'],
-      baker: json['baker'],
-      type: json['type'],
-      imageLink: json['imageLink'],
-      description: json['description'],
-      price: (json['price'] as num).toDouble(), // Asegura que sea double
+      nombre: json['nombre'],
+      idTipo: json['id_tipo'],
+      precio: json['precio'],
+      tipoNombre: json['tipoNombre'], // <- nombre del tipo si viene del join
     );
-  }
 
-  Map<String, dynamic> toJSON() {
-    return {
-      'id': id,
-      'name': name,
-      'baker': baker,
-      'type': type,
-      'imageLink': imageLink,
-      'description': description,
-      'price': price,
-    };
-  }
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'nombre': nombre,
+    'id_tipo': idTipo,
+    'precio': precio,
+  };
 }

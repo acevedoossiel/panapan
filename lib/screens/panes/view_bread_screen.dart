@@ -132,6 +132,7 @@ class VerPanesScreen extends StatelessWidget {
               );
             }
           } else {
+            if (!context.mounted) return;
             _showAddDialog(context, breadProvider, tipoProvider);
           }
         },
@@ -151,6 +152,8 @@ class VerPanesScreen extends StatelessWidget {
     int? selectedTipoId;
 
     await tipoProvider.loadTipos();
+
+    if (!context.mounted) return;
 
     showDialog(
       context: context,
@@ -224,6 +227,8 @@ class VerPanesScreen extends StatelessWidget {
     int selectedTipoId = pan.idTipo;
 
     await tipoProvider.loadTipos();
+
+    if (!context.mounted) return;
 
     showDialog(
       context: context,

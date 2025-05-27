@@ -84,6 +84,7 @@ class IngredientesScreen extends StatelessWidget {
               );
             }
           } else {
+            if (!context.mounted) return;
             _showAddDialog(context, ingredienteProvider, unidadProvider);
           }
         },
@@ -102,6 +103,8 @@ class IngredientesScreen extends StatelessWidget {
     int? selectedUnidadId;
 
     await unidadProvider.loadUnidades();
+
+    if (!context.mounted) return;
 
     showDialog(
       context: context,
@@ -175,6 +178,8 @@ class IngredientesScreen extends StatelessWidget {
     int selectedUnidadId = ingrediente.idUnidad;
 
     await unidadProvider.loadUnidades();
+
+    if (!context.mounted) return;
 
     showDialog(
       context: context,

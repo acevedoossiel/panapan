@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             child: Row(
               children: [
-                Icon(icon, size: 28, color: Color(0xFF4D3C2B)),
+                Icon(icon, size: 28, color: const Color(0xFF4D3C2B)),
                 const SizedBox(width: 16),
                 Text(
                   label,

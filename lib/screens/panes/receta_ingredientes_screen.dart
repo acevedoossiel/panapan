@@ -53,6 +53,8 @@ class RecetaIngredientesScreen extends StatelessWidget {
         onPressed: () async {
           await ingredienteProvider.loadIngredientes();
 
+          if (!context.mounted) return;
+
           _showAddDialog(context, recetaProvider, ingredienteProvider);
         },
         child: const Icon(Icons.add),

@@ -45,7 +45,7 @@ jobs:
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=acevedoossiel_panapan \
             -Dsonar.organization=acevedoossiel \
-            -Dsonar.sources="lib/screens" \
+            -Dsonar.sources="./lib/screens"
             -Dsonar.inclusions="lib/screens/**" \
             -Dsonar.tests="test" \
             -Dsonar.test.inclusions="test/**" \

@@ -64,9 +64,7 @@ class HomeScreen extends StatelessWidget {
                 context,
                 icon: Icons.calculate,
                 label: 'Calculadora',
-                onTap: () {
-                  // TODO: Navegar a CalculadoraScreen
-                },
+                onTap: () {},
               ),
             ],
           ),

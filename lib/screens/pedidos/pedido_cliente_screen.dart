@@ -62,12 +62,16 @@ class PedidoClienteScreen extends StatelessWidget {
                           panDulceList.isNotEmpty ? panDulceList.first : null;
 
                       if (panDulce != null) {
-                        _mostrarModalAsignarDulces(context, panDulce);
+                        if (context.mounted) {
+                          _mostrarModalAsignarDulces(context, panDulce);
+                        }
                       } else {
-                        _mostrarResumenDetalles(
-                          context,
-                          detallesProvider.detalles,
-                        );
+                        if (context.mounted) {
+                          _mostrarResumenDetalles(
+                            context,
+                            detallesProvider.detalles,
+                          );
+                        }
                       }
                     },
                   ),
@@ -313,7 +317,7 @@ class PedidoClienteScreen extends StatelessWidget {
                     whereArgs: [dulce.id],
                   );
 
-                  final idPedido = dulce.idPedidoCliente!;
+                  final idPedido = dulce.idPedidoCliente;
                   final idCriollo = await db.query(
                     'tipos',
                     where: "tipo = ?",
@@ -338,7 +342,9 @@ class PedidoClienteScreen extends StatelessWidget {
                     );
                   }
 
-                  Navigator.pop(context);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text("Guardar"),
               ),

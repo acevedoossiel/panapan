@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:panes_app/screens/panes/receta_ingredientes_screen.dart';
 import 'package:provider/provider.dart';
 import '../../models/bread_model.dart';
 import '../../providers/bread_provider.dart';
-import '../../providers/tipo_provider.dart';
 
-class VerPanesScreen extends StatelessWidget {
+class VerPanesScreen extends StatefulWidget {
   const VerPanesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final breadProvider = Provider.of<BreadProvider>(context);
-    final tipoProvider = Provider.of<TipoProvider>(context, listen: false);
+  State<VerPanesScreen> createState() => _VerPanesScreenState();
+}
 
+class _VerPanesScreenState extends State<VerPanesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<BreadProvider>(context, listen: false).loadBreads();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFDF7F2),
       appBar: AppBar(
         title: const Text('Panes'),
         backgroundColor: Colors.amber[700],
       ),
-      body: FutureBuilder(
-        future: breadProvider.loadBreads(),
-        builder: (context, snapshot) {
+      body: Consumer<BreadProvider>(
+        builder: (context, breadProvider, _) {
           final panes = breadProvider.breads;
 
           if (panes.isEmpty) {
@@ -59,7 +64,7 @@ class VerPanesScreen extends StatelessWidget {
                     ),
                   ),
                   subtitle: Text(
-                    "Precio: \$${pan.precio.toStringAsFixed(2)} - Tipo: ${pan.tipoNombre ?? 'Desconocido'}",
+                    "Precio: \$${pan.precio.toStringAsFixed(2)}",
                     style: const TextStyle(color: Color(0xFF4D3C2B)),
                   ),
                   trailing: Row(
@@ -68,37 +73,13 @@ class VerPanesScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _showEditDialog(
-                            context,
-                            breadProvider,
-                            tipoProvider,
-                            pan,
-                          );
+                          _showEditDialog(context, breadProvider, pan);
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
                           await breadProvider.deleteBread(pan.id!);
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.receipt_long,
-                          color: Colors.green,
-                        ),
-                        tooltip: 'Asignar ingredientes',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => RecetaIngredientesScreen(
-                                    idPan: pan.id!,
-                                    nombrePan: pan.nombre,
-                                  ),
-                            ),
-                          );
                         },
                       ),
                     ],
@@ -110,31 +91,11 @@ class VerPanesScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await tipoProvider.loadTipos();
-          if (tipoProvider.tipos.isEmpty) {
-            if (context.mounted) {
-              showDialog(
-                context: context,
-                builder:
-                    (_) => AlertDialog(
-                      title: const Text('No se puede agregar pan'),
-                      content: const Text(
-                        'Debes registrar al menos un tipo de pan antes de poder agregar uno.',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Aceptar'),
-                        ),
-                      ],
-                    ),
-              );
-            }
-          } else {
-            if (!context.mounted) return;
-            _showAddDialog(context, breadProvider, tipoProvider);
-          }
+        onPressed: () {
+          _showAddDialog(
+            context,
+            Provider.of<BreadProvider>(context, listen: false),
+          );
         },
         backgroundColor: Colors.amber[700],
         child: const Icon(Icons.add),
@@ -142,67 +103,59 @@ class VerPanesScreen extends StatelessWidget {
     );
   }
 
-  void _showAddDialog(
-    BuildContext context,
-    BreadProvider breadProvider,
-    TipoProvider tipoProvider,
-  ) async {
-    final TextEditingController nombreCtrl = TextEditingController();
-    final TextEditingController precioCtrl = TextEditingController();
-    int? selectedTipoId;
-
-    await tipoProvider.loadTipos();
-
-    if (!context.mounted) return;
+  void _showAddDialog(BuildContext context, BreadProvider breadProvider) {
+    final nombreCtrl = TextEditingController();
+    final precioCtrl = TextEditingController();
+    final detallesCtrl = TextEditingController();
+    final recetaUnidadCtrl = TextEditingController();
 
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
             title: const Text("Agregar nuevo pan"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                ),
-                TextField(
-                  controller: precioCtrl,
-                  decoration: const InputDecoration(labelText: 'Precio'),
-                  keyboardType: TextInputType.number,
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedTipoId,
-                  hint: const Text("Selecciona un tipo"),
-                  items:
-                      tipoProvider.tipos
-                          .map(
-                            (tipo) => DropdownMenuItem(
-                              value: tipo.id,
-                              child: Text(tipo.tipo),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    selectedTipoId = value;
-                  },
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: nombreCtrl,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  TextField(
+                    controller: detallesCtrl,
+                    decoration: const InputDecoration(labelText: 'Detalles'),
+                  ),
+                  TextField(
+                    controller: recetaUnidadCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Unidad de receta',
+                    ),
+                  ),
+                  TextField(
+                    controller: precioCtrl,
+                    decoration: const InputDecoration(labelText: 'Precio'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () async {
-                  if (nombreCtrl.text.isNotEmpty &&
-                      precioCtrl.text.isNotEmpty &&
-                      selectedTipoId != null) {
-                    final nuevo = BreadModel(
-                      nombre: nombreCtrl.text,
-                      precio: double.parse(precioCtrl.text),
-                      idTipo: selectedTipoId!,
-                    );
-                    await breadProvider.addBread(nuevo);
-                    if (context.mounted) Navigator.pop(context);
+                  try {
+                    if (nombreCtrl.text.isNotEmpty &&
+                        precioCtrl.text.isNotEmpty) {
+                      final nuevo = PanModel(
+                        nombre: nombreCtrl.text,
+                        detalles: detallesCtrl.text,
+                        recetaUnidad: recetaUnidadCtrl.text,
+                        precio: double.parse(precioCtrl.text),
+                      );
+                      await breadProvider.addBread(nuevo);
+                      if (context.mounted) Navigator.pop(context);
+                    }
+                  } catch (e) {
+                    print("Error al agregar pan: $e");
                   }
                 },
                 child: const Text("Guardar"),
@@ -215,68 +168,58 @@ class VerPanesScreen extends StatelessWidget {
   void _showEditDialog(
     BuildContext context,
     BreadProvider breadProvider,
-    TipoProvider tipoProvider,
-    BreadModel pan,
-  ) async {
-    final TextEditingController nombreCtrl = TextEditingController(
-      text: pan.nombre,
-    );
-    final TextEditingController precioCtrl = TextEditingController(
-      text: pan.precio.toString(),
-    );
-    int selectedTipoId = pan.idTipo;
-
-    await tipoProvider.loadTipos();
-
-    if (!context.mounted) return;
+    PanModel pan,
+  ) {
+    final nombreCtrl = TextEditingController(text: pan.nombre);
+    final detallesCtrl = TextEditingController(text: pan.detalles);
+    final recetaUnidadCtrl = TextEditingController(text: pan.recetaUnidad);
+    final precioCtrl = TextEditingController(text: pan.precio.toString());
 
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
             title: const Text("Editar pan"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                ),
-                TextField(
-                  controller: precioCtrl,
-                  decoration: const InputDecoration(labelText: 'Precio'),
-                  keyboardType: TextInputType.number,
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedTipoId,
-                  items:
-                      tipoProvider.tipos
-                          .map(
-                            (tipo) => DropdownMenuItem(
-                              value: tipo.id,
-                              child: Text(tipo.tipo),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    if (value != null) selectedTipoId = value;
-                  },
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: nombreCtrl,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                  ),
+                  TextField(
+                    controller: detallesCtrl,
+                    decoration: const InputDecoration(labelText: 'Detalles'),
+                  ),
+                  TextField(
+                    controller: recetaUnidadCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Unidad de receta',
+                    ),
+                  ),
+                  TextField(
+                    controller: precioCtrl,
+                    decoration: const InputDecoration(labelText: 'Precio'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () async {
-                  if (nombreCtrl.text.isNotEmpty &&
-                      precioCtrl.text.isNotEmpty) {
-                    final actualizado = BreadModel(
+                  try {
+                    final actualizado = PanModel(
                       id: pan.id,
                       nombre: nombreCtrl.text,
+                      detalles: detallesCtrl.text,
+                      recetaUnidad: recetaUnidadCtrl.text,
                       precio: double.parse(precioCtrl.text),
-                      idTipo: selectedTipoId,
                     );
                     await breadProvider.updateBread(actualizado);
                     if (context.mounted) Navigator.pop(context);
+                  } catch (e) {
+                    print("Error al actualizar pan: $e");
                   }
                 },
                 child: const Text("Actualizar"),

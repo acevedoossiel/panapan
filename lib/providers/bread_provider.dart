@@ -3,25 +3,22 @@ import '../models/bread_model.dart';
 import '../db/db_provider.dart';
 
 class BreadProvider extends ChangeNotifier {
-  List<BreadModel> _breads = [];
+  List<PanModel> _breads = [];
 
-  List<BreadModel> get breads => _breads;
+  List<PanModel> get breads => _breads;
 
   Future<void> loadBreads() async {
     final db = await DBProvider.db.database;
-    final res = await db.rawQuery('''
-    SELECT panes.id, panes.nombre, panes.id_tipo, panes.precio, tipos.tipo AS tipoNombre
-    FROM panes
-    LEFT JOIN tipos ON panes.id_tipo = tipos.id
-  ''');
-    _breads = res.map((e) => BreadModel.fromMap(e)).toList();
+    final res = await db.query('panes');
+    _breads = res.map((e) => PanModel.fromMap(e)).toList();
     notifyListeners();
   }
 
-  Future<void> addBread(BreadModel bread) async {
+  Future<void> addBread(PanModel bread) async {
     final db = await DBProvider.db.database;
-    await db.insert('panes', bread.toMap());
-    await loadBreads(); // << Esto recarga todo con JOIN y tipoNombre
+    final id = await db.insert('panes', bread.toMap());
+    print("Nuevo pan insertado con ID: $id");
+    await loadBreads();
   }
 
   Future<void> deleteBread(int id) async {
@@ -30,9 +27,9 @@ class BreadProvider extends ChangeNotifier {
     await loadBreads();
   }
 
-  Future<void> updateBread(BreadModel pan) async {
+  Future<void> updateBread(PanModel pan) async {
     final db = await DBProvider.db.database;
     await db.update('panes', pan.toMap(), where: 'id = ?', whereArgs: [pan.id]);
-    await loadBreads(); // << También lo vuelve a cargar con JOIN
+    await loadBreads();
   }
 }

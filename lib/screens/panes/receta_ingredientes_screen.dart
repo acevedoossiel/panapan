@@ -36,7 +36,7 @@ class RecetaIngredientesScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final r = recetas[index];
               return ListTile(
-                title: Text('${r.ingredienteNombre ?? '¿?'}'),
+                title: Text(r.ingredienteNombre ?? '¿?'),
                 subtitle: Text('${r.cantidad} ${r.unidadNombre ?? ''}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),

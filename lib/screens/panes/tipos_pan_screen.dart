@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../models/tipo_model.dart';
-import '../../../providers/tipo_provider.dart';
+import '../../../models/tipo_pan_model.dart';
+import '../../../providers/tipo_pan_provider.dart';
 
 class TiposPanScreen extends StatelessWidget {
   const TiposPanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tipoProvider = Provider.of<TipoProvider>(context);
+    final tipoPanProvider = Provider.of<TipoPanProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tipos de Pan'),
+        title: const Text('Tipos de Pan HD'),
         backgroundColor: Colors.amber[700],
       ),
       body: FutureBuilder(
-        future: tipoProvider.loadTipos(),
+        future: tipoPanProvider.loadTipos(),
         builder: (context, snapshot) {
-          final tipos = tipoProvider.tipos;
+          final tipos = tipoPanProvider.tipos;
 
           return ListView.builder(
             itemCount: tipos.length,
@@ -26,19 +26,22 @@ class TiposPanScreen extends StatelessWidget {
               final tipo = tipos[index];
               return ListTile(
                 title: Text(tipo.tipo),
+                subtitle: Text(
+                  'Precio: \$${tipo.precioBase} - Charolas: ${tipo.cantidadPorCharola}',
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.blue),
                       onPressed: () {
-                        _showEditDialog(context, tipoProvider, tipo);
+                        _showEditDialog(context, tipoPanProvider, tipo);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
-                        await tipoProvider.deleteTipo(tipo.id!);
+                        await tipoPanProvider.deleteTipo(tipo.id!);
                       },
                     ),
                   ],
@@ -50,27 +53,60 @@ class TiposPanScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddDialog(context, tipoProvider);
+          _showAddDialog(context, tipoPanProvider);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showAddDialog(BuildContext context, TipoProvider tipoProvider) {
-    final TextEditingController controller = TextEditingController();
+  void _showAddDialog(BuildContext context, TipoPanProvider provider) {
+    final TextEditingController tipoCtrl = TextEditingController();
+    final TextEditingController precioCtrl = TextEditingController();
+    final TextEditingController cantidadCtrl = TextEditingController();
+
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
             title: const Text("Agregar nuevo tipo de pan"),
-            content: TextField(controller: controller),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: tipoCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del tipo',
+                  ),
+                ),
+                TextField(
+                  controller: precioCtrl,
+                  decoration: const InputDecoration(labelText: 'Precio Base'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: cantidadCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Panes por charola',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
             actions: [
               TextButton(
                 onPressed: () async {
-                  final nuevo = controller.text.trim();
-                  if (nuevo.isNotEmpty) {
-                    await tipoProvider.insertTipo(nuevo);
+                  final tipo = tipoCtrl.text.trim();
+                  final precio = double.tryParse(precioCtrl.text.trim());
+                  final cantidad = int.tryParse(cantidadCtrl.text.trim());
+
+                  if (tipo.isNotEmpty && precio != null && cantidad != null) {
+                    final nuevo = TipoPanModel(
+                      tipo: tipo,
+                      precioBase: precio,
+                      cantidadPorCharola: cantidad,
+                    );
+                    await provider.insertTipo(nuevo);
                     if (context.mounted) Navigator.pop(context);
                   }
                 },
@@ -83,24 +119,64 @@ class TiposPanScreen extends StatelessWidget {
 
   void _showEditDialog(
     BuildContext context,
-    TipoProvider tipoProvider,
-    TipoModel tipo,
+    TipoPanProvider provider,
+    TipoPanModel tipo,
   ) {
-    final TextEditingController controller = TextEditingController(
+    final TextEditingController tipoCtrl = TextEditingController(
       text: tipo.tipo,
     );
+    final TextEditingController precioCtrl = TextEditingController(
+      text: tipo.precioBase.toString(),
+    );
+    final TextEditingController cantidadCtrl = TextEditingController(
+      text: tipo.cantidadPorCharola.toString(),
+    );
+
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
             title: const Text("Editar tipo de pan"),
-            content: TextField(controller: controller),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: tipoCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre del tipo',
+                  ),
+                ),
+                TextField(
+                  controller: precioCtrl,
+                  decoration: const InputDecoration(labelText: 'Precio Base'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: cantidadCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Panes por charola',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
             actions: [
               TextButton(
                 onPressed: () async {
-                  final actualizado = controller.text.trim();
-                  if (actualizado.isNotEmpty) {
-                    await tipoProvider.updateTipo(tipo.id!, actualizado);
+                  final tipoText = tipoCtrl.text.trim();
+                  final precio = double.tryParse(precioCtrl.text.trim());
+                  final cantidad = int.tryParse(cantidadCtrl.text.trim());
+
+                  if (tipoText.isNotEmpty &&
+                      precio != null &&
+                      cantidad != null) {
+                    final actualizado = TipoPanModel(
+                      id: tipo.id,
+                      tipo: tipoText,
+                      precioBase: precio,
+                      cantidadPorCharola: cantidad,
+                    );
+                    await provider.updateTipo(actualizado);
                     if (context.mounted) Navigator.pop(context);
                   }
                 },

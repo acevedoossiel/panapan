@@ -73,14 +73,6 @@ class PanesMenuScreen extends StatelessWidget {
                 );
               },
             ),
-            _buildMenuButton(
-              context,
-              icon: Icons.receipt_long,
-              label: 'Asignar a panes',
-              onTap: () {
-                // TODO: Navegar a receta de panes
-              },
-            ),
           ],
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:panes_app/screens/clientes_screen.dart';
 import 'package:panes_app/screens/panes/panes_menu_screen.dart';
+import 'package:panes_app/screens/pedidos/pedido_cliente_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,17 +39,25 @@ class HomeScreen extends StatelessWidget {
               _buildMenuButton(
                 context,
                 icon: Icons.store,
-                label: 'Proveedores',
+                label: 'Clientes',
                 onTap: () {
-                  // TODO: Navegar a ProveedoresScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ClientesScreen()),
+                  );
                 },
               ),
               _buildMenuButton(
                 context,
                 icon: Icons.menu_book,
-                label: 'Recetas',
+                label: 'Pedidos',
                 onTap: () {
-                  // TODO: Navegar a RecetasScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PedidoClienteScreen(),
+                    ),
+                  );
                 },
               ),
               _buildMenuButton(

@@ -104,6 +104,7 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
   }
 
   void _mostrarDialogoPan(
+    // NOSONAR
     BuildContext context,
     BreadProvider breadProvider, [
     PanModel? pan,

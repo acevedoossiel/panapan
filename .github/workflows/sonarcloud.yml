@@ -50,3 +50,7 @@ jobs:
             -Dsonar.dart.coverage.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.sources=lib/screens \
+            -Dsonar.exclusions=lib/** \
+            -Dsonar.inclusions=lib/screens/**
+

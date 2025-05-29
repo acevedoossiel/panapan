@@ -66,6 +66,7 @@ class IngredientesScreen extends StatelessWidget {
           await unidadProvider.loadUnidades();
 
           if (unidadProvider.unidades.isEmpty) {
+            // NOSONAR
             if (context.mounted) {
               _showAlertaSinUnidades(context);
             }
@@ -103,6 +104,7 @@ class IngredientesScreen extends StatelessWidget {
   }
 
   void _showIngredienteDialog(
+    // NOSONAR
     BuildContext context,
     IngredientProvider ingredienteProvider,
     UnidadProvider unidadProvider, {

@@ -22,8 +22,8 @@ class HomeScreen extends StatelessWidget {
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF4D3C2B),
-                ),
-              ),
+                ), //text style
+              ), //texto
               const SizedBox(height: 32),
               _buildMenuButton(
                 context,
@@ -52,10 +52,10 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ],
-          ),
-        ),
-      ),
-    );
+          ), //column
+        ), //Padding
+      ), //safearea
+    ); //scaffold
   }
 
   Widget _buildMenuButton(
@@ -85,14 +85,14 @@ class HomeScreen extends StatelessWidget {
                     fontSize: 18,
                     color: Color(0xFF4D3C2B),
                     fontWeight: FontWeight.w500,
-                  ),
-                ),
+                  ), //TextStyle
+                ), //Text
               ],
-            ),
-          ),
-        ),
-      ),
-    );
+            ), //Row
+          ), //padding
+        ), //inkwell
+      ), //material
+    ); //container
   }
 
   void _navigateTo(BuildContext context, Widget screen) {

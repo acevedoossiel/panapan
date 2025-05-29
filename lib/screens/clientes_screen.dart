@@ -40,18 +40,18 @@ class ClientesScreen extends StatelessWidget {
                       onPressed: () async {
                         await clienteProvider.deleteCliente(cliente.id!);
                       },
-                    ),
+                    ), //icono
                   ],
-                ),
-              );
+                ), //row
+              ); //listtile
             },
-          );
+          ); //listview
         },
-      ),
+      ), //futurwbuilder
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context, clienteProvider),
         child: const Icon(Icons.add),
-      ),
+      ), //floatingActionButton
     );
   }
 
@@ -62,69 +62,93 @@ class ClientesScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Nuevo cliente"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(controller: direccionCtrl, decoration: const InputDecoration(labelText: 'Dirección')),
-            TextField(controller: telefonoCtrl, decoration: const InputDecoration(labelText: 'Teléfono')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              if (nombreCtrl.text.isNotEmpty) {
-                final nuevo = ClienteModel(
-                  nombre: nombreCtrl.text,
-                  direccion: direccionCtrl.text,
-                  telefono: telefonoCtrl.text,
-                );
-                await clienteProvider.insertCliente(nuevo);
-                if (context.mounted) Navigator.pop(context);
-              }
-            },
-            child: const Text("Guardar"),
-          ),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Nuevo cliente"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nombreCtrl,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                ),
+                TextField(
+                  controller: direccionCtrl,
+                  decoration: const InputDecoration(labelText: 'Dirección'),
+                ),
+                TextField(
+                  controller: telefonoCtrl,
+                  decoration: const InputDecoration(labelText: 'Teléfono'),
+                ),
+              ],
+            ), //column
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  if (nombreCtrl.text.isNotEmpty) {
+                    final nuevo = ClienteModel(
+                      nombre: nombreCtrl.text,
+                      direccion: direccionCtrl.text,
+                      telefono: telefonoCtrl.text,
+                    ); //clientModel
+                    await clienteProvider.insertCliente(nuevo);
+                    if (context.mounted) Navigator.pop(context);
+                  }
+                },
+                child: const Text("Guardar"),
+              ), //boton de texto
+            ],
+          ), //alertdialog
     );
   }
 
-  void _showEditDialog(BuildContext context, ClienteProvider clienteProvider, ClienteModel cliente) {
+  void _showEditDialog(
+    BuildContext context,
+    ClienteProvider clienteProvider,
+    ClienteModel cliente,
+  ) {
     final nombreCtrl = TextEditingController(text: cliente.nombre);
     final direccionCtrl = TextEditingController(text: cliente.direccion);
     final telefonoCtrl = TextEditingController(text: cliente.telefono);
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Ver/Editar cliente"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(controller: direccionCtrl, decoration: const InputDecoration(labelText: 'Dirección')),
-            TextField(controller: telefonoCtrl, decoration: const InputDecoration(labelText: 'Teléfono')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              final actualizado = ClienteModel(
-                id: cliente.id,
-                nombre: nombreCtrl.text,
-                direccion: direccionCtrl.text,
-                telefono: telefonoCtrl.text,
-              );
-              await clienteProvider.updateCliente(actualizado);
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text("Actualizar"),
-          ),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Ver/Editar cliente"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nombreCtrl,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                ),
+                TextField(
+                  controller: direccionCtrl,
+                  decoration: const InputDecoration(labelText: 'Dirección'),
+                ),
+                TextField(
+                  controller: telefonoCtrl,
+                  decoration: const InputDecoration(labelText: 'Teléfono'),
+                ),
+              ],
+            ), //column a
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  final actualizado = ClienteModel(
+                    id: cliente.id,
+                    nombre: nombreCtrl.text,
+                    direccion: direccionCtrl.text,
+                    telefono: telefonoCtrl.text,
+                  ); //modelo de cliente
+                  await clienteProvider.updateCliente(actualizado);
+                  if (context.mounted) Navigator.pop(context);
+                },
+                child: const Text("Actualizar"),
+              ), //boton
+            ],
+          ), //alerta
     );
   }
 }

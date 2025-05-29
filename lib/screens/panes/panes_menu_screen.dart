@@ -14,7 +14,7 @@ class PanesMenuScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Gestión de Panes'),
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      ),
+      ), //appbar
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
@@ -26,8 +26,8 @@ class PanesMenuScreen extends StatelessWidget {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF4D3C2B),
-              ),
-            ),
+              ), //estilo de texto
+            ), //texto o
             const SizedBox(height: 24),
             _buildMenuButton(
               context,
@@ -54,9 +54,9 @@ class PanesMenuScreen extends StatelessWidget {
               onTap: () => _navigateTo(context, const IngredientesScreen()),
             ),
           ],
-        ),
-      ),
-    );
+        ), //columna
+      ), //paddi
+    ); //scaffold
   }
 
   Widget _buildMenuButton(
@@ -86,14 +86,14 @@ class PanesMenuScreen extends StatelessWidget {
                     fontSize: 18,
                     color: Color(0xFF4D3C2B),
                     fontWeight: FontWeight.w500,
-                  ),
-                ),
+                  ), //textoustyle
+                ), //textoo
               ],
-            ),
-          ),
-        ),
-      ),
-    );
+            ), //rou
+          ), //padi
+        ), //ink well
+      ), // mateiral
+    ); //contenedor
   }
 
   void _navigateTo(BuildContext context, Widget screen) {

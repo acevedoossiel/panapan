@@ -29,42 +29,27 @@ class HomeScreen extends StatelessWidget {
                 context,
                 icon: Icons.bakery_dining,
                 label: 'Gestión de Panes',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PanesMenuScreen()),
-                  );
-                },
+                onTap: () => _navigateTo(context, const PanesMenuScreen()),
               ),
               _buildMenuButton(
                 context,
                 icon: Icons.store,
                 label: 'Clientes',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ClientesScreen()),
-                  );
-                },
+                onTap: () => _navigateTo(context, const ClientesScreen()),
               ),
               _buildMenuButton(
                 context,
                 icon: Icons.menu_book,
                 label: 'Pedidos',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PedidoClienteScreen(),
-                    ),
-                  );
-                },
+                onTap: () => _navigateTo(context, const PedidoClienteScreen()),
               ),
               _buildMenuButton(
                 context,
                 icon: Icons.calculate,
                 label: 'Calculadora',
-                onTap: () {},
+                onTap: () {
+                  // Aquí puedes implementar la navegación o lógica que desees
+                },
               ),
             ],
           ),
@@ -108,5 +93,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 }

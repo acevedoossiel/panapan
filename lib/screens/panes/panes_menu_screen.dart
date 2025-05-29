@@ -33,45 +33,25 @@ class PanesMenuScreen extends StatelessWidget {
               context,
               icon: Icons.bakery_dining,
               label: 'Panes',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const VerPanesScreen()),
-                );
-              },
+              onTap: () => _navigateTo(context, const VerPanesScreen()),
             ),
             _buildMenuButton(
               context,
               icon: Icons.category,
               label: 'Tipos de Pan',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const TiposPanScreen()),
-                );
-              },
+              onTap: () => _navigateTo(context, const TiposPanScreen()),
             ),
             _buildMenuButton(
               context,
               icon: Icons.straighten,
               label: 'Unidades',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const UnidadesScreen()),
-                );
-              },
+              onTap: () => _navigateTo(context, const UnidadesScreen()),
             ),
             _buildMenuButton(
               context,
               icon: Icons.kitchen,
               label: 'Ingredientes',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const IngredientesScreen()),
-                );
-              },
+              onTap: () => _navigateTo(context, const IngredientesScreen()),
             ),
           ],
         ),
@@ -114,5 +94,9 @@ class PanesMenuScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 }

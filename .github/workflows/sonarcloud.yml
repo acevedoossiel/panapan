@@ -45,10 +45,8 @@ jobs:
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=acevedoossiel_panapan \
             -Dsonar.organization=acevedoossiel \
-            -Dsonar.sources="./lib/screens"
-            -Dsonar.inclusions="lib/screens/**" \
-            -Dsonar.tests="test" \
-            -Dsonar.test.inclusions="test/**" \
+            -Dsonar.sources=screens \lib
+            -Dsonar.tests=test \
             -Dsonar.dart.coverage.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}

@@ -161,8 +161,9 @@ class IngredientesScreen extends StatelessWidget {
                 onPressed: () async {
                   if (nombreCtrl.text.isEmpty ||
                       cantidadCtrl.text.isEmpty ||
-                      selectedUnidadId == null)
+                      selectedUnidadId == null) {
                     return;
+                  }
 
                   final model = IngredientModel(
                     id: isEditing ? ingrediente!.id : null,

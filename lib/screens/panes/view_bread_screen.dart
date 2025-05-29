@@ -155,6 +155,7 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
                       if (context.mounted) Navigator.pop(context);
                     }
                   } catch (e) {
+                    // ignore: avoid_print
                     print("Error al agregar pan: $e");
                   }
                 },
@@ -219,6 +220,7 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
                     await breadProvider.updateBread(actualizado);
                     if (context.mounted) Navigator.pop(context);
                   } catch (e) {
+                    // ignore: avoid_print
                     print("Error al actualizar pan: $e");
                   }
                 },

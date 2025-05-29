@@ -17,6 +17,7 @@ class BreadProvider extends ChangeNotifier {
   Future<void> addBread(PanModel bread) async {
     final db = await DBProvider.db.database;
     final id = await db.insert('panes', bread.toMap());
+    // ignore: avoid_print
     print("Nuevo pan insertado con ID: $id");
     await loadBreads();
   }

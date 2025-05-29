@@ -85,6 +85,7 @@ class PedidoClienteScreen extends StatelessWidget {
         onPressed: () async {
           await clienteProvider.loadClientes();
           await Provider.of<TipoPanProvider>(
+            // ignore: use_build_context_synchronously
             context,
             listen: false,
           ).loadTipos();

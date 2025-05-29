@@ -35,7 +35,12 @@ class TiposPanScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.blue),
                       onPressed: () {
-                        _showEditDialog(context, tipoPanProvider, tipo);
+                        _mostrarDialogoTipoPan(
+                          context,
+                          tipoPanProvider,
+                          isEditing: true,
+                          tipoPan: tipo,
+                        );
                       },
                     ),
                     IconButton(
@@ -53,90 +58,36 @@ class TiposPanScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddDialog(context, tipoPanProvider);
+          _mostrarDialogoTipoPan(context, tipoPanProvider);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showAddDialog(BuildContext context, TipoPanProvider provider) {
-    final TextEditingController tipoCtrl = TextEditingController();
-    final TextEditingController precioCtrl = TextEditingController();
-    final TextEditingController cantidadCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Agregar nuevo tipo de pan"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: tipoCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre del tipo',
-                  ),
-                ),
-                TextField(
-                  controller: precioCtrl,
-                  decoration: const InputDecoration(labelText: 'Precio Base'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: cantidadCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Panes por charola',
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  final tipo = tipoCtrl.text.trim();
-                  final precio = double.tryParse(precioCtrl.text.trim());
-                  final cantidad = int.tryParse(cantidadCtrl.text.trim());
-
-                  if (tipo.isNotEmpty && precio != null && cantidad != null) {
-                    final nuevo = TipoPanModel(
-                      tipo: tipo,
-                      precioBase: precio,
-                      cantidadPorCharola: cantidad,
-                    );
-                    await provider.insertTipo(nuevo);
-                    if (context.mounted) Navigator.pop(context);
-                  }
-                },
-                child: const Text("Guardar"),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showEditDialog(
+  void _mostrarDialogoTipoPan(
     BuildContext context,
-    TipoPanProvider provider,
-    TipoPanModel tipo,
-  ) {
-    final TextEditingController tipoCtrl = TextEditingController(
-      text: tipo.tipo,
+    TipoPanProvider provider, {
+    bool isEditing = false,
+    TipoPanModel? tipoPan,
+  }) {
+    final tipoCtrl = TextEditingController(
+      text: isEditing ? tipoPan!.tipo : '',
     );
-    final TextEditingController precioCtrl = TextEditingController(
-      text: tipo.precioBase.toString(),
+    final precioCtrl = TextEditingController(
+      text: isEditing ? tipoPan!.precioBase.toString() : '',
     );
-    final TextEditingController cantidadCtrl = TextEditingController(
-      text: tipo.cantidadPorCharola.toString(),
+    final cantidadCtrl = TextEditingController(
+      text: isEditing ? tipoPan!.cantidadPorCharola.toString() : '',
     );
 
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
-            title: const Text("Editar tipo de pan"),
+            title: Text(
+              isEditing ? "Editar tipo de pan" : "Agregar nuevo tipo de pan",
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -170,17 +121,23 @@ class TiposPanScreen extends StatelessWidget {
                   if (tipoText.isNotEmpty &&
                       precio != null &&
                       cantidad != null) {
-                    final actualizado = TipoPanModel(
-                      id: tipo.id,
+                    final model = TipoPanModel(
+                      id: isEditing ? tipoPan!.id : null,
                       tipo: tipoText,
                       precioBase: precio,
                       cantidadPorCharola: cantidad,
                     );
-                    await provider.updateTipo(actualizado);
+
+                    if (isEditing) {
+                      await provider.updateTipo(model);
+                    } else {
+                      await provider.insertTipo(model);
+                    }
+
                     if (context.mounted) Navigator.pop(context);
                   }
                 },
-                child: const Text("Actualizar"),
+                child: Text(isEditing ? "Actualizar" : "Guardar"),
               ),
             ],
           ),

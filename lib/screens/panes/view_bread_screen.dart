@@ -73,7 +73,7 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _showEditDialog(context, breadProvider, pan);
+                          _mostrarDialogoPan(context, breadProvider, pan);
                         },
                       ),
                       IconButton(
@@ -92,7 +92,7 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddDialog(
+          _mostrarDialogoPan(
             context,
             Provider.of<BreadProvider>(context, listen: false),
           );
@@ -103,17 +103,26 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
     );
   }
 
-  void _showAddDialog(BuildContext context, BreadProvider breadProvider) {
-    final nombreCtrl = TextEditingController();
-    final precioCtrl = TextEditingController();
-    final detallesCtrl = TextEditingController();
-    final recetaUnidadCtrl = TextEditingController();
+  void _mostrarDialogoPan(
+    BuildContext context,
+    BreadProvider breadProvider, [
+    PanModel? pan,
+  ]) {
+    final isEditing = pan != null;
+    final nombreCtrl = TextEditingController(text: pan?.nombre ?? '');
+    final detallesCtrl = TextEditingController(text: pan?.detalles ?? '');
+    final recetaUnidadCtrl = TextEditingController(
+      text: pan?.recetaUnidad ?? '',
+    );
+    final precioCtrl = TextEditingController(
+      text: pan?.precio.toString() ?? '',
+    );
 
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
-            title: const Text("Agregar nuevo pan"),
+            title: Text(isEditing ? "Editar pan" : "Agregar nuevo pan"),
             content: SingleChildScrollView(
               child: Column(
                 children: [
@@ -143,88 +152,34 @@ class _VerPanesScreenState extends State<VerPanesScreen> {
               TextButton(
                 onPressed: () async {
                   try {
-                    if (nombreCtrl.text.isNotEmpty &&
-                        precioCtrl.text.isNotEmpty) {
-                      final nuevo = PanModel(
-                        nombre: nombreCtrl.text,
-                        detalles: detallesCtrl.text,
-                        recetaUnidad: recetaUnidadCtrl.text,
-                        precio: double.parse(precioCtrl.text),
+                    final nombre = nombreCtrl.text.trim();
+                    final detalles = detallesCtrl.text.trim();
+                    final recetaUnidad = recetaUnidadCtrl.text.trim();
+                    final precio = double.tryParse(precioCtrl.text.trim());
+
+                    if (nombre.isNotEmpty && precio != null) {
+                      final nuevoPan = PanModel(
+                        id: isEditing ? pan.id : null,
+                        nombre: nombre,
+                        detalles: detalles,
+                        recetaUnidad: recetaUnidad,
+                        precio: precio,
                       );
-                      await breadProvider.addBread(nuevo);
+
+                      if (isEditing) {
+                        await breadProvider.updateBread(nuevoPan);
+                      } else {
+                        await breadProvider.addBread(nuevoPan);
+                      }
+
                       if (context.mounted) Navigator.pop(context);
                     }
                   } catch (e) {
                     // ignore: avoid_print
-                    print("Error al agregar pan: $e");
+                    print("Error al guardar pan: $e");
                   }
                 },
-                child: const Text("Guardar"),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showEditDialog(
-    BuildContext context,
-    BreadProvider breadProvider,
-    PanModel pan,
-  ) {
-    final nombreCtrl = TextEditingController(text: pan.nombre);
-    final detallesCtrl = TextEditingController(text: pan.detalles);
-    final recetaUnidadCtrl = TextEditingController(text: pan.recetaUnidad);
-    final precioCtrl = TextEditingController(text: pan.precio.toString());
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Editar pan"),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: nombreCtrl,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
-                  ),
-                  TextField(
-                    controller: detallesCtrl,
-                    decoration: const InputDecoration(labelText: 'Detalles'),
-                  ),
-                  TextField(
-                    controller: recetaUnidadCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Unidad de receta',
-                    ),
-                  ),
-                  TextField(
-                    controller: precioCtrl,
-                    decoration: const InputDecoration(labelText: 'Precio'),
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  try {
-                    final actualizado = PanModel(
-                      id: pan.id,
-                      nombre: nombreCtrl.text,
-                      detalles: detallesCtrl.text,
-                      recetaUnidad: recetaUnidadCtrl.text,
-                      precio: double.parse(precioCtrl.text),
-                    );
-                    await breadProvider.updateBread(actualizado);
-                    if (context.mounted) Navigator.pop(context);
-                  } catch (e) {
-                    // ignore: avoid_print
-                    print("Error al actualizar pan: $e");
-                  }
-                },
-                child: const Text("Actualizar"),
+                child: Text(isEditing ? "Actualizar" : "Guardar"),
               ),
             ],
           ),

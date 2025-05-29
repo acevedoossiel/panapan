@@ -37,11 +37,12 @@ class IngredientesScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.blue),
                       onPressed: () {
-                        _showEditDialog(
+                        _showIngredienteDialog(
                           context,
                           ingredienteProvider,
                           unidadProvider,
-                          ingrediente,
+                          isEditing: true,
+                          ingrediente: ingrediente,
                         );
                       },
                     ),
@@ -66,26 +67,15 @@ class IngredientesScreen extends StatelessWidget {
 
           if (unidadProvider.unidades.isEmpty) {
             if (context.mounted) {
-              showDialog(
-                context: context,
-                builder:
-                    (_) => AlertDialog(
-                      title: const Text('No se puede agregar ingrediente'),
-                      content: const Text(
-                        'Debes registrar al menos una unidad antes de poder agregar un ingrediente.',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Aceptar'),
-                        ),
-                      ],
-                    ),
-              );
+              _showAlertaSinUnidades(context);
             }
           } else {
             if (!context.mounted) return;
-            _showAddDialog(context, ingredienteProvider, unidadProvider);
+            _showIngredienteDialog(
+              context,
+              ingredienteProvider,
+              unidadProvider,
+            );
           }
         },
         child: const Icon(Icons.add),
@@ -93,14 +83,39 @@ class IngredientesScreen extends StatelessWidget {
     );
   }
 
-  void _showAddDialog(
+  void _showAlertaSinUnidades(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('No se puede agregar ingrediente'),
+            content: const Text(
+              'Debes registrar al menos una unidad antes de poder agregar un ingrediente.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Aceptar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showIngredienteDialog(
     BuildContext context,
     IngredientProvider ingredienteProvider,
-    UnidadProvider unidadProvider,
-  ) async {
-    final TextEditingController nombreCtrl = TextEditingController();
-    final TextEditingController cantidadCtrl = TextEditingController();
-    int? selectedUnidadId;
+    UnidadProvider unidadProvider, {
+    bool isEditing = false,
+    IngredientModel? ingrediente,
+  }) async {
+    final nombreCtrl = TextEditingController(
+      text: isEditing ? ingrediente!.nombre : '',
+    );
+    final cantidadCtrl = TextEditingController(
+      text: isEditing ? ingrediente!.cantidad.toString() : '',
+    );
+    int? selectedUnidadId = isEditing ? ingrediente!.idUnidad : null;
 
     await unidadProvider.loadUnidades();
 
@@ -110,7 +125,9 @@ class IngredientesScreen extends StatelessWidget {
       context: context,
       builder:
           (_) => AlertDialog(
-            title: const Text("Agregar ingrediente"),
+            title: Text(
+              isEditing ? "Editar ingrediente" : "Agregar ingrediente",
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -135,99 +152,34 @@ class IngredientesScreen extends StatelessWidget {
                             ),
                           )
                           .toList(),
-                  onChanged: (value) {
-                    selectedUnidadId = value!;
-                  },
+                  onChanged: (value) => selectedUnidadId = value!,
                 ),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () async {
-                  if (nombreCtrl.text.isNotEmpty &&
-                      cantidadCtrl.text.isNotEmpty &&
-                      selectedUnidadId != null) {
-                    final nuevo = IngredientModel(
-                      nombre: nombreCtrl.text,
-                      cantidad: double.parse(cantidadCtrl.text),
-                      idUnidad: selectedUnidadId!,
-                    );
-                    await ingredienteProvider.insertIngrediente(nuevo);
-                    if (context.mounted) Navigator.pop(context);
-                  }
-                },
-                child: const Text("Guardar"),
-              ),
-            ],
-          ),
-    );
-  }
+                  if (nombreCtrl.text.isEmpty ||
+                      cantidadCtrl.text.isEmpty ||
+                      selectedUnidadId == null)
+                    return;
 
-  void _showEditDialog(
-    BuildContext context,
-    IngredientProvider ingredienteProvider,
-    UnidadProvider unidadProvider,
-    IngredientModel ingrediente,
-  ) async {
-    final TextEditingController nombreCtrl = TextEditingController(
-      text: ingrediente.nombre,
-    );
-    final TextEditingController cantidadCtrl = TextEditingController(
-      text: ingrediente.cantidad.toString(),
-    );
-    int selectedUnidadId = ingrediente.idUnidad;
-
-    await unidadProvider.loadUnidades();
-
-    if (!context.mounted) return;
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Editar ingrediente"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                ),
-                TextField(
-                  controller: cantidadCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Cantidad'),
-                ),
-                DropdownButtonFormField<int>(
-                  value: selectedUnidadId,
-                  items:
-                      unidadProvider.unidades
-                          .map(
-                            (u) => DropdownMenuItem(
-                              value: u.id,
-                              child: Text(u.tipo),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    if (value != null) selectedUnidadId = value;
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  final actualizado = IngredientModel(
-                    id: ingrediente.id,
+                  final model = IngredientModel(
+                    id: isEditing ? ingrediente!.id : null,
                     nombre: nombreCtrl.text,
                     cantidad: double.parse(cantidadCtrl.text),
-                    idUnidad: selectedUnidadId,
+                    idUnidad: selectedUnidadId!,
                   );
-                  await ingredienteProvider.updateIngrediente(actualizado);
+
+                  if (isEditing) {
+                    await ingredienteProvider.updateIngrediente(model);
+                  } else {
+                    await ingredienteProvider.insertIngrediente(model);
+                  }
+
                   if (context.mounted) Navigator.pop(context);
                 },
-                child: const Text("Actualizar"),
+                child: Text(isEditing ? "Actualizar" : "Guardar"),
               ),
             ],
           ),

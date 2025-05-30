@@ -45,7 +45,7 @@ jobs:
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=acevedoossiel_panapan \
             -Dsonar.organization=acevedoossiel \
-            -Dsonar.sources=lib \
+            -Dsonar.sources=lib/providers \
             -Dsonar.tests=test \
             -Dsonar.dart.coverage.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \

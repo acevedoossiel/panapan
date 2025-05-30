@@ -3,11 +3,17 @@ import 'package:path/path.dart';
 
 class DBProvider {
   static Database? _database;
+  static Database? _testDb;
   static final DBProvider db = DBProvider._();
 
   DBProvider._();
 
+  static set overrideDatabase(Database db) {
+    _testDb = db;
+  }
+
   Future<Database> get database async {
+    if (_testDb != null) return _testDb!;
     if (_database != null) return _database!;
     _database = await initDB();
     return _database!;
@@ -15,7 +21,6 @@ class DBProvider {
 
   Future<Database> initDB() async {
     final path = join(await getDatabasesPath(), 'panapan.db');
-    //await deleteDatabase(path); // 
 
     return await openDatabase(
       path,

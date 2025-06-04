@@ -10,83 +10,153 @@ import '../../providers/tipo_pan_provider.dart';
 import '../../providers/pedido_detalle_provider.dart';
 import 'package:intl/intl.dart';
 
-
-class PedidoClienteScreen extends StatelessWidget {
+class PedidoClienteScreen extends StatefulWidget {
   const PedidoClienteScreen({super.key});
+
+  @override
+  State<PedidoClienteScreen> createState() => _PedidoClienteScreenState();
+}
+
+class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
+  DateTime? fechaSeleccionada;
+
+  @override
+  void initState() {
+    super.initState();
+    fechaSeleccionada = DateTime.now();
+    Provider.of<PedidoProvider>(
+      context,
+      listen: false,
+    ).loadPedidosConClientes();
+  }
 
   @override
   Widget build(BuildContext context) {
     final pedidoProvider = Provider.of<PedidoProvider>(context);
     final clienteProvider = Provider.of<ClienteProvider>(context);
 
+    final pedidosFiltrados =
+        pedidoProvider.pedidos.where((pedido) {
+          final fechaPedido = DateTime.parse(pedido.fecha);
+          return fechaPedido.year == fechaSeleccionada!.year &&
+              fechaPedido.month == fechaSeleccionada!.month &&
+              fechaPedido.day == fechaSeleccionada!.day;
+        }).toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pedidos de Clientes'),
         backgroundColor: Colors.amber[800],
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Pedidos de Clientes', style: TextStyle(fontSize: 20)),
+            Text(
+              '📅 ${DateFormat('dd/MM/yyyy').format(fechaSeleccionada!)}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            ),
+          ],
+        ),
       ),
-      body: FutureBuilder(
-        future: pedidoProvider.loadPedidosConClientes(),
-        builder: (context, snapshot) {
-          final pedidos = pedidoProvider.pedidos;
 
-          if (pedidos.isEmpty) {
-            return const Center(child: Text('No hay pedidos aún'));
-          }
+      body: Column(
+        children: [
+          // FILTRO SUPERIOR
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      fechaSeleccionada = DateTime.now();
+                    });
+                  },
+                  child: const Text('Hoy'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final DateTime? fecha = await showDatePicker(
+                      context: context,
+                      initialDate: fechaSeleccionada!,
+                      firstDate: DateTime(2024),
+                      lastDate: DateTime(2030),
+                    );
+                    if (fecha != null) {
+                      setState(() {
+                        fechaSeleccionada = fecha;
+                      });
+                    }
+                  },
+                  child: const Text('Seleccionar fecha'),
+                ),
+                const SizedBox(width: 10),
+              ],
+            ),
+          ),
 
-          return ListView.builder(
-            itemCount: pedidos.length,
-            itemBuilder: (context, index) {
-              final pedido = pedidos[index];
-              return Card(
-                margin: const EdgeInsets.all(10),
-                elevation: 4,
-                child: ListTile(
-                  title: Text(
-                    'Cliente: ${pedido.nombreCliente ?? 'Desconocido'}',
-                  ),
-                  subtitle: Text('Fecha: ${pedido.fecha}'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios),
-                    onPressed: () async {
-                      final idPedido = pedido.id;
-                      final detallesProvider =
-                          Provider.of<PedidoDetalleProvider>(
-                            context,
-                            listen: false,
-                          );
-                      await detallesProvider.loadDetallesForPedido(idPedido!);
-
-                      final panDulceList =
-                          detallesProvider.detalles
-                              .where((d) => d.tipoPanNombre == 'Dulce')
-                              .toList();
-
-                      final PedidoDetalleModel? panDulce =
-                          panDulceList.isNotEmpty ? panDulceList.first : null;
-                      if (context.mounted) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => DetallePedidoScreen(
-                                  detalles: detallesProvider.detalles,
+          Expanded(
+            child:
+                pedidosFiltrados.isEmpty
+                    ? const Center(
+                      child: Text('No hay pedidos para esta fecha'),
+                    )
+                    : ListView.builder(
+                      itemCount: pedidosFiltrados.length,
+                      itemBuilder: (context, index) {
+                        final pedido = pedidosFiltrados[index];
+                        return Card(
+                          margin: const EdgeInsets.all(10),
+                          elevation: 4,
+                          child: ListTile(
+                            title: Text('Pedido ID: ${pedido.id}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Cliente: ${pedido.nombreCliente ?? 'Desconocido'}',
                                 ),
+                                Text('Fecha: ${formatearFecha(pedido.fecha)}'),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.arrow_forward_ios),
+                              onPressed: () async {
+                                final idPedido = pedido.id;
+                                final detallesProvider =
+                                    Provider.of<PedidoDetalleProvider>(
+                                      context,
+                                      listen: false,
+                                    );
+                                await detallesProvider.loadDetallesForPedido(
+                                  idPedido!,
+                                );
+
+                                if (context.mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => DetallePedidoScreen(
+                                            detalles: detallesProvider.detalles,
+                                          ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           ),
                         );
-                      }
-                    },
-                  ),
-                ),
-              );
-            },
-          );
-        },
+                      },
+                    ),
+          ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await clienteProvider.loadClientes();
           await Provider.of<TipoPanProvider>(
-            // ignore: use_build_context_synchronously
             context,
             listen: false,
           ).loadTipos();
@@ -97,6 +167,11 @@ class PedidoClienteScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  String formatearFecha(String iso) {
+    final fecha = DateTime.parse(iso);
+    return DateFormat('dd/MM/yyyy – hh:mm a').format(fecha);
   }
 
   void _mostrarFormularioNuevoPedido(BuildContext context) {

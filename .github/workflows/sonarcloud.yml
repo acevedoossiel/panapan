@@ -32,6 +32,13 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage
 
+      - name: List coverage files (verificación)
+        run: |
+          echo "Contenido de coverage/"
+          ls -la coverage
+          echo "Primeras 20 líneas del archivo lcov.info"
+          head -n 20 coverage/lcov.info
+
       - name: Download SonarScanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panes_app/screens/calculadora/calculadora_screens.dart';
 import 'package:provider/provider.dart';
 import '../../../models/tipo_pan_model.dart';
 import '../../../providers/tipo_pan_provider.dart';
@@ -29,28 +30,42 @@ class TiposPanScreen extends StatelessWidget {
                 subtitle: Text(
                   'Precio: \$${tipo.precioBase} - Charolas: ${tipo.cantidadPorCharola}',
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () {
-                        _mostrarDialogoTipoPan(
-                          context,
-                          tipoPanProvider,
-                          isEditing: true,
-                          tipoPan: tipo,
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        await tipoPanProvider.deleteTipo(tipo.id!);
-                      },
-                    ),
-                  ],
-                ),
+trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    IconButton(
+      icon: const Icon(Icons.edit, color: Colors.blue),
+      onPressed: () {
+        _mostrarDialogoTipoPan(
+          context,
+          tipoPanProvider,
+          isEditing: true,
+          tipoPan: tipo,
+        );
+      },
+    ),
+    if (tipo.tipo != 'Dulce') // 👈 solo si no es "Dulce"
+      IconButton(
+        icon: const Icon(Icons.calculate, color: Colors.deepPurple),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CalculadoraScreen(tipo: tipo),
+            ),
+          );
+        },
+      ),
+    IconButton(
+      icon: const Icon(Icons.delete, color: Colors.red),
+      onPressed: () async {
+        await tipoPanProvider.deleteTipo(tipo.id!);
+      },
+    ),
+  ],
+),
+
+
               );
             },
           );

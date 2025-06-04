@@ -8,6 +8,8 @@ import '../../providers/pedido_provider.dart';
 import '../../providers/cliente_provider.dart';
 import '../../providers/tipo_pan_provider.dart';
 import '../../providers/pedido_detalle_provider.dart';
+import 'package:intl/intl.dart';
+
 
 class PedidoClienteScreen extends StatelessWidget {
   const PedidoClienteScreen({super.key});
@@ -61,17 +63,17 @@ class PedidoClienteScreen extends StatelessWidget {
 
                       final PedidoDetalleModel? panDulce =
                           panDulceList.isNotEmpty ? panDulceList.first : null;
-if (context.mounted) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => DetallePedidoScreen(
-        detalles: detallesProvider.detalles,
-      ),
-    ),
-  );
-}
-
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => DetallePedidoScreen(
+                                  detalles: detallesProvider.detalles,
+                                ),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ),

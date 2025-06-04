@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panes_app/screens/pedidos/detalle_pedido_screen.dart';
 import 'package:provider/provider.dart';
 import '../../db/db_provider.dart';
 import '../../models/pedido_cliente_model.dart';
@@ -60,19 +61,17 @@ class PedidoClienteScreen extends StatelessWidget {
 
                       final PedidoDetalleModel? panDulce =
                           panDulceList.isNotEmpty ? panDulceList.first : null;
+if (context.mounted) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => DetallePedidoScreen(
+        detalles: detallesProvider.detalles,
+      ),
+    ),
+  );
+}
 
-                      if (panDulce != null) {
-                        if (context.mounted) {
-                          _mostrarModalAsignarDulces(context, panDulce);
-                        }
-                      } else {
-                        if (context.mounted) {
-                          _mostrarResumenDetalles(
-                            context,
-                            detallesProvider.detalles,
-                          );
-                        }
-                      }
                     },
                   ),
                 ),

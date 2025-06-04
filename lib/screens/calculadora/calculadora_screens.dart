@@ -139,7 +139,7 @@ class _CalculadoraScreenState extends State<CalculadoraScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cálculo para ${tipo.tipo}'),
+        title: Text('Ingredientes para ${tipo.tipo}'),
         backgroundColor: Colors.deepPurple,
       ),
       body: Padding(
@@ -149,8 +149,8 @@ class _CalculadoraScreenState extends State<CalculadoraScreen> {
           children: [
             Text('Tipo de pan: ${tipo.tipo}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text('Precio base: \$${tipo.precioBase}'),
-            Text('Charolas: ${tipo.cantidadPorCharola}'),
+            Text('Precio por pieza: \$${tipo.precioBase}'),
+            Text('Panes por charola: ${tipo.cantidadPorCharola}'),
             const SizedBox(height: 16),
             const Text('Ingredientes:', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 8),

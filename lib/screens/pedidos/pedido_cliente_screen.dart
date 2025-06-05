@@ -157,6 +157,7 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
         onPressed: () async {
           await clienteProvider.loadClientes();
           await Provider.of<TipoPanProvider>(
+            // ignore: use_build_context_synchronously
             context,
             listen: false,
           ).loadTipos();
@@ -305,6 +306,7 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
     );
   }
 
+  // ignore: unused_element
   void _mostrarResumenDetalles(
     BuildContext context,
     List<PedidoDetalleModel> detalles,
@@ -338,6 +340,7 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
     );
   }
 
+  // ignore: unused_element
   void _mostrarModalAsignarDulces(
     BuildContext context,
     PedidoDetalleModel dulce,

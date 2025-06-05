@@ -113,7 +113,7 @@ body: FutureBuilder<List<List<Map<String, dynamic>>>>(
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
@@ -167,7 +167,7 @@ body: FutureBuilder<List<List<Map<String, dynamic>>>>(
       ],
     ),
   );
-}).toList(),
+}),
                 ],
               ),
             ),
@@ -309,6 +309,7 @@ body: FutureBuilder<List<List<Map<String, dynamic>>>>(
       [idTipoPan],
     );
 
+    // ignore: avoid_print
     print('Receta para tipoPan $idTipoPan: $resultado'); // 👈 importante
 
     return resultado;

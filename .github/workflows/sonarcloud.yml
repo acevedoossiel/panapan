@@ -32,26 +32,8 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage
 
-      - name: "DEBUG: show lcov path before and after sed"
-        run: |
-          echo "ANTES:"
-          grep SF coverage/lcov.info | head -n 5
-          sed -i 's|SF:lib/|SF:./lib/|g' coverage/lcov.info
-          echo "DESPUÉS:"
-          grep SF coverage/lcov.info | head -n 5
-
-      - name: Install Python dependencies
-        run: pip install lcov_cobertura
-
-      - name: Convert lcov.info to cobertura.xml (v1 compatible)
-        run: lcov_cobertura coverage/lcov.info --output coverage/cobertura.xml
-
-      - name: List converted coverage (verificación)
-        run: |
-          echo "Contenido de coverage/"
-          ls -la coverage
-          echo "Primeras 20 líneas de cobertura.xml"
-          head -n 20 coverage/cobertura.xml
+      - name: Fix lcov paths
+        run: sed -i 's|SF:lib/|SF:./lib/|g' coverage/lcov.info
 
       - name: Download SonarScanner
         run: |
@@ -68,6 +50,6 @@ jobs:
             -Dsonar.organization=acevedoossiel \
             -Dsonar.sources=lib \
             -Dsonar.tests=test \
-            -Dsonar.coverageReportPaths=coverage/cobertura.xml \
+            -Dsonar.dart.coverage.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}

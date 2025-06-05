@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:panes_app/screens/pedidos/detalle_pedido_screen.dart';
 import 'package:provider/provider.dart';
-import '../../db/db_provider.dart';
+// import '../../db/db_provider.dart';
 import '../../models/pedido_cliente_model.dart';
 import '../../models/pedido_detalle_model.dart';
 import '../../providers/pedido_provider.dart';
@@ -9,6 +9,7 @@ import '../../providers/cliente_provider.dart';
 import '../../providers/tipo_pan_provider.dart';
 import '../../providers/pedido_detalle_provider.dart';
 import 'package:intl/intl.dart';
+// import '../../widgets/asignar_dulces_form.dart';
 
 class PedidoClienteScreen extends StatefulWidget {
   const PedidoClienteScreen({super.key});
@@ -340,96 +341,85 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
     );
   }
 
-  // ignore: unused_element
-  void _mostrarModalAsignarDulces(
-    BuildContext context,
-    PedidoDetalleModel dulce,
-  ) {
-    final criolloCtrl = TextEditingController();
-    final finoCtrl = TextEditingController();
+  // // ignore: unused_element
+  // void _mostrarModalAsignarDulces(
+  //   BuildContext context,
+  //   PedidoDetalleModel dulce,
+  // ) {
+  //   final criolloCtrl = TextEditingController();
+  //   final finoCtrl = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Asignar dulces'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Cantidad total: ${dulce.cantidad}'),
-                TextField(
-                  controller: criolloCtrl,
-                  decoration: const InputDecoration(labelText: 'Dulce Criollo'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: finoCtrl,
-                  decoration: const InputDecoration(labelText: 'Dulce Fino'),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  final criollo = int.tryParse(criolloCtrl.text) ?? 0;
-                  final fino = int.tryParse(finoCtrl.text) ?? 0;
-                  final total = criollo + fino;
+  //   showDialog(
+  //     context: context,
+  //     builder:
+  //         (_) => AlertDialog(
+  //           title: const Text('Asignar dulces'),
+  //           content: AsignarDulcesForm(
+  //             cantidadTotal: dulce.cantidad,
+  //             criolloCtrl: criolloCtrl,
+  //             finoCtrl: finoCtrl,
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () async {
+  //                 final criollo = int.tryParse(criolloCtrl.text) ?? 0;
+  //                 final fino = int.tryParse(finoCtrl.text) ?? 0;
+  //                 final total = criollo + fino;
 
-                  if (total != dulce.cantidad) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('La suma debe ser ${dulce.cantidad}'),
-                      ),
-                    );
-                    return;
-                  }
+  //                 if (total != dulce.cantidad) {
+  //                   ScaffoldMessenger.of(context).showSnackBar(
+  //                     SnackBar(
+  //                       content: Text('La suma debe ser ${dulce.cantidad}'),
+  //                     ),
+  //                   );
+  //                   return;
+  //                 }
 
-                  final detalleProvider = Provider.of<PedidoDetalleProvider>(
-                    context,
-                    listen: false,
-                  );
-                  final db = await DBProvider.db.database;
+  //                 final detalleProvider = Provider.of<PedidoDetalleProvider>(
+  //                   context,
+  //                   listen: false,
+  //                 );
+  //                 final db = await DBProvider.db.database;
 
-                  await db.delete(
-                    'pedido_cliente_detalle',
-                    where: 'id = ?',
-                    whereArgs: [dulce.id],
-                  );
+  //                 await db.delete(
+  //                   'pedido_cliente_detalle',
+  //                   where: 'id = ?',
+  //                   whereArgs: [dulce.id],
+  //                 );
 
-                  final idPedido = dulce.idPedidoCliente;
-                  final idCriollo = await db.query(
-                    'tipos',
-                    where: "tipo = ?",
-                    whereArgs: ['Dulce Criollo'],
-                  );
-                  final idFino = await db.query(
-                    'tipos',
-                    where: "tipo = ?",
-                    whereArgs: ['Dulce Fino'],
-                  );
+  //                 final idPedido = dulce.idPedidoCliente;
+  //                 final idCriollo = await db.query(
+  //                   'tipos',
+  //                   where: "tipo = ?",
+  //                   whereArgs: ['Dulce Criollo'],
+  //                 );
+  //                 final idFino = await db.query(
+  //                   'tipos',
+  //                   where: "tipo = ?",
+  //                   whereArgs: ['Dulce Fino'],
+  //                 );
 
-                  if (idCriollo.isNotEmpty && idFino.isNotEmpty) {
-                    await detalleProvider.insertDetalle(
-                      idPedido,
-                      idCriollo.first['id'] as int,
-                      criollo,
-                    );
-                    await detalleProvider.insertDetalle(
-                      idPedido,
-                      idFino.first['id'] as int,
-                      fino,
-                    );
-                  }
+  //                 if (idCriollo.isNotEmpty && idFino.isNotEmpty) {
+  //                   await detalleProvider.insertDetalle(
+  //                     idPedido,
+  //                     idCriollo.first['id'] as int,
+  //                     criollo,
+  //                   );
+  //                   await detalleProvider.insertDetalle(
+  //                     idPedido,
+  //                     idFino.first['id'] as int,
+  //                     fino,
+  //                   );
+  //                 }
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text("Guardar"),
-              ),
-            ],
-          ),
-    );
-  }
+  //                 if (context.mounted) {
+  //                   Navigator.pop(context);
+  //                 }
+  //               },
+  //               child: const Text("Guardar"),
+  //             ),
+  //           ],
+  //         ),
+  //   );
+  // }
 }

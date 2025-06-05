@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../models/cliente_model.dart';
 import '../../../providers/cliente_provider.dart';
+import '../../../widgets/cliente_form.dart';
 
 class ClientesScreen extends StatelessWidget {
   const ClientesScreen({super.key});
@@ -40,18 +41,18 @@ class ClientesScreen extends StatelessWidget {
                       onPressed: () async {
                         await clienteProvider.deleteCliente(cliente.id!);
                       },
-                    ), //icono
+                    ),
                   ],
-                ), //row
-              ); //listtile
+                ),
+              );
             },
-          ); //listview
+          );
         },
-      ), //futurwbuilder
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context, clienteProvider),
         child: const Icon(Icons.add),
-      ), //floatingActionButton
+      ),
     );
   }
 
@@ -65,23 +66,11 @@ class ClientesScreen extends StatelessWidget {
       builder:
           (_) => AlertDialog(
             title: const Text("Nuevo cliente"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                ),
-                TextField(
-                  controller: direccionCtrl,
-                  decoration: const InputDecoration(labelText: 'Dirección'),
-                ),
-                TextField(
-                  controller: telefonoCtrl,
-                  decoration: const InputDecoration(labelText: 'Teléfono'),
-                ),
-              ],
-            ), //column
+            content: ClienteForm(
+              nombreCtrl: nombreCtrl,
+              direccionCtrl: direccionCtrl,
+              telefonoCtrl: telefonoCtrl,
+            ),
             actions: [
               TextButton(
                 onPressed: () async {
@@ -90,15 +79,15 @@ class ClientesScreen extends StatelessWidget {
                       nombre: nombreCtrl.text,
                       direccion: direccionCtrl.text,
                       telefono: telefonoCtrl.text,
-                    ); //clientModel
+                    );
                     await clienteProvider.insertCliente(nuevo);
                     if (context.mounted) Navigator.pop(context);
                   }
                 },
                 child: const Text("Guardar"),
-              ), //boton de texto
+              ),
             ],
-          ), //alertdialog
+          ),
     );
   }
 
@@ -116,23 +105,11 @@ class ClientesScreen extends StatelessWidget {
       builder:
           (_) => AlertDialog(
             title: const Text("Ver/Editar cliente"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                ),
-                TextField(
-                  controller: direccionCtrl,
-                  decoration: const InputDecoration(labelText: 'Dirección'),
-                ),
-                TextField(
-                  controller: telefonoCtrl,
-                  decoration: const InputDecoration(labelText: 'Teléfono'),
-                ),
-              ],
-            ), //column a
+            content: ClienteForm(
+              nombreCtrl: nombreCtrl,
+              direccionCtrl: direccionCtrl,
+              telefonoCtrl: telefonoCtrl,
+            ),
             actions: [
               TextButton(
                 onPressed: () async {
@@ -141,14 +118,14 @@ class ClientesScreen extends StatelessWidget {
                     nombre: nombreCtrl.text,
                     direccion: direccionCtrl.text,
                     telefono: telefonoCtrl.text,
-                  ); //modelo de cliente
+                  );
                   await clienteProvider.updateCliente(actualizado);
                   if (context.mounted) Navigator.pop(context);
                 },
                 child: const Text("Actualizar"),
-              ), //boton
+              ),
             ],
-          ), //alerta
+          ),
     );
   }
 }

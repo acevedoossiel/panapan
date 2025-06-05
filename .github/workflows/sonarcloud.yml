@@ -29,6 +29,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Ajustar rutas del lcov.info (requerido por sonar-scanner)
+        run: sed -i 's|SF:lib/|SF:./lib/|g' coverage/lcov.info
+
       - name: Download SonarScanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
@@ -44,5 +50,6 @@ jobs:
             -Dsonar.organization=acevedoossiel \
             -Dsonar.sources=lib \
             -Dsonar.tests=test \
+            -Dsonar.dart.coverage.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}

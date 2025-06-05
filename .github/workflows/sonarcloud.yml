@@ -32,8 +32,14 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage
 
-      - name: Fix lcov paths
-        run: sed -i 's|SF:lib/|SF:./lib/|g' coverage/lcov.info
+      - name: "DEBUG: show lcov path before and after sed"
+        run: |
+          echo "ANTES:"
+          grep SF coverage/lcov.info | head -n 5
+          sed -i 's|SF:lib/|SF:./lib/|g' coverage/lcov.info
+          echo "DESPUÉS:"
+          grep SF coverage/lcov.info | head -n 5
+
 
       - name: List coverage files (verificación)
         run: |

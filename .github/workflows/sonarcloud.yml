@@ -40,8 +40,8 @@ jobs:
           echo "DESPUÉS:"
           grep SF coverage/lcov.info | head -n 5
 
-      - name: Install Python dependencies (lcov2cobertura)
-        run: pip install lcov2cobertura
+      - name: Install Python dependencies
+        run: pip install lcov_cobertura
 
       - name: Convert lcov.info to cobertura.xml (v1 compatible)
         run: lcov_cobertura coverage/lcov.info --output coverage/cobertura.xml

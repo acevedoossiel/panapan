@@ -39,6 +39,7 @@ dependencies:
   sqflite: ^2.4.2
   path: ^1.9.1
   intl: ^0.18.1
+  flutter_launcher_icons: ^0.13.1 
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +57,12 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  
 flutter:
 
   # The following line ensures that the Material Icons font is

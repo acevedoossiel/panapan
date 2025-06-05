@@ -35,4 +35,25 @@ class PedidoProvider with ChangeNotifier {
     await loadPedidos();
     return id;
   }
+
+  Future<List<PedidoClienteModel>> loadPedidosByDate(DateTime fecha) async {
+    final db = await DBProvider.db.database;
+
+    // Convertimos la fecha a formato 'YYYY-MM-DD'
+    final fechaFormateada =
+        '${fecha.year.toString().padLeft(4, '0')}-${fecha.month.toString().padLeft(2, '0')}-${fecha.day.toString().padLeft(2, '0')}';
+
+    final res = await db.rawQuery(
+      '''
+    SELECT p.id, p.id_cliente, p.fecha, p.total, c.nombre AS nombre_cliente
+    FROM pedido_cliente p
+    JOIN clientes c ON p.id_cliente = c.id
+    WHERE DATE(p.fecha) = ?
+    ORDER BY p.fecha DESC
+  ''',
+      [fechaFormateada],
+    );
+
+    return res.map((e) => PedidoClienteModel.fromMap(e)).toList();
+  }
 }

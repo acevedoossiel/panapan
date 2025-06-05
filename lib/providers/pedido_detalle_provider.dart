@@ -21,6 +21,27 @@ class PedidoDetalleProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<List<PedidoDetalleModel>> loadDetallesPorFecha(DateTime fecha) async {
+    final db = await DBProvider.db.database;
+
+    // Formato ISO corto (solo fecha)
+    final fechaFormato = fecha.toIso8601String().substring(0, 10);
+
+    // Buscar pedidos del día con sus detalles y nombre del tipo de pan
+    final detallesRaw = await db.rawQuery(
+      '''
+    SELECT pcd.*, t.tipo AS tipoPanNombre
+    FROM pedido_cliente_detalle pcd
+    JOIN pedido_cliente pc ON pcd.id_pedido_cliente = pc.id
+    JOIN tipos t ON pcd.id_tipo_pan = t.id
+    WHERE DATE(pc.fecha) = ?
+  ''',
+      [fechaFormato],
+    );
+
+    return detallesRaw.map((e) => PedidoDetalleModel.fromMap(e)).toList();
+  }
+
   Future<void> insertDetalle(
     int idPedidoCliente,
     int idTipoPan,

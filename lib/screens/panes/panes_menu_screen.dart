@@ -43,12 +43,6 @@ class PanesMenuScreen extends StatelessWidget {
             ),
             _buildMenuButton(
               context,
-              icon: Icons.straighten,
-              label: 'Unidades',
-              onTap: () => _navigateTo(context, const UnidadesScreen()),
-            ),
-            _buildMenuButton(
-              context,
               icon: Icons.kitchen,
               label: 'Ingredientes',
               onTap: () => _navigateTo(context, const IngredientesScreen()),

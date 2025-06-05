@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panes_app/screens/pedidos/detalle_pedido_screen.dart';
+import 'package:panes_app/screens/pedidos/resumen_ingredientes_dia_creen.dart';
 import 'package:provider/provider.dart';
 import '../../db/db_provider.dart';
 import '../../models/pedido_cliente_model.dart';
@@ -18,7 +19,7 @@ class PedidoClienteScreen extends StatefulWidget {
 }
 
 class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
-  DateTime? fechaSeleccionada;
+  late DateTime fechaSeleccionada;
 
   @override
   void initState() {
@@ -57,10 +58,8 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
           ],
         ),
       ),
-
       body: Column(
         children: [
-          // FILTRO SUPERIOR
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(
@@ -153,18 +152,50 @@ class _PedidoClienteScreenState extends State<PedidoClienteScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await clienteProvider.loadClientes();
-          await Provider.of<TipoPanProvider>(
-            context,
-            listen: false,
-          ).loadTipos();
-          if (!context.mounted) return;
-          _mostrarFormularioNuevoPedido(context);
-        },
-        backgroundColor: Colors.amber[800],
-        child: const Icon(Icons.add),
+      floatingActionButton: Stack(
+        children: [
+          // Botón de resumen (izquierda)
+          Positioned(
+            left: 30,
+            bottom: 16,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => ResumenIngredientesDiaScreen(
+                          fecha:
+                              fechaSeleccionada, // asegúrate que esta variable esté definida
+                        ),
+                  ),
+                );
+              },
+              backgroundColor: Colors.brown[400],
+              icon: const Icon(Icons.receipt_long),
+              label: const Text('Resumen'),
+            ),
+          ),
+
+          // Botón de agregar pedido (derecha)
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: () async {
+                await clienteProvider.loadClientes();
+                await Provider.of<TipoPanProvider>(
+                  context,
+                  listen: false,
+                ).loadTipos();
+                if (!context.mounted) return;
+                _mostrarFormularioNuevoPedido(context);
+              },
+              backgroundColor: Colors.amber[800],
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ],
       ),
     );
   }

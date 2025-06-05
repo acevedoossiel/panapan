@@ -43,14 +43,6 @@ class HomeScreen extends StatelessWidget {
                 label: 'Pedidos',
                 onTap: () => _navigateTo(context, const PedidoClienteScreen()),
               ),
-              _buildMenuButton(
-                context,
-                icon: Icons.calculate,
-                label: 'Calculadora',
-                onTap: () {
-                  // Aquí puedes implementar la navegación o lógica que desees
-                },
-              ),
             ],
           ), //column
         ), //Padding

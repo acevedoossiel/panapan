@@ -25,7 +25,7 @@ class DBProvider {
     return await openDatabase(
       path,
       version: 1,
-      
+
       onCreate: (Database db, int version) async {
         await db.execute('''
           CREATE TABLE unidades (
@@ -33,8 +33,6 @@ class DBProvider {
             tipo TEXT
           );
         ''');
-
-        await insertarUnidadesPorDefecto(db);
 
         await db.execute('''
           CREATE TABLE tipos (
@@ -107,24 +105,25 @@ class DBProvider {
             FOREIGN KEY (id_tipo_pan) REFERENCES tipos(id)
           );
         ''');
+        await insertarUnidadesPorDefecto(db);
       },
     );
   }
 
   Future<void> insertarUnidadesPorDefecto(Database db) async {
-  final List<Map<String, dynamic>> unidadesActuales = await db.query('unidades');
+    final List<Map<String, dynamic>> unidadesActuales = await db.query(
+      'unidades',
+    );
 
-  final List<String> tiposExistentes = unidadesActuales.map((u) => u['tipo'].toString()).toList();
+    final List<String> tiposExistentes =
+        unidadesActuales.map((u) => u['tipo'].toString()).toList();
 
-  final List<String> unidadesPorDefecto = ['pz', 'ml', 'gr'];
+    final List<String> unidadesPorDefecto = ['pz', 'ml', 'gr'];
 
-  for (var tipo in unidadesPorDefecto) {
-    if (!tiposExistentes.contains(tipo)) {
-      await db.insert('unidades', {'tipo': tipo});
+    for (var tipo in unidadesPorDefecto) {
+      if (!tiposExistentes.contains(tipo)) {
+        await db.insert('unidades', {'tipo': tipo});
+      }
     }
   }
-}
-
-
-
 }

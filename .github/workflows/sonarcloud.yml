@@ -40,11 +40,11 @@ jobs:
           echo "DESPUÉS:"
           grep SF coverage/lcov.info | head -n 5
 
-      - name: Install Python dependencies
-        run: pip install lcov-cobertura
+      - name: Install Python dependencies (lcov2cobertura)
+        run: pip install lcov2cobertura
 
-      - name: Convert lcov.info to cobertura.xml
-        run: lcov_cobertura coverage/lcov.info -o coverage/cobertura.xml
+      - name: Convert lcov.info to cobertura.xml (v1 compatible)
+        run: lcov_cobertura coverage/lcov.info --output coverage/cobertura.xml
 
       - name: List converted coverage (verificación)
         run: |
@@ -70,4 +70,4 @@ jobs:
             -Dsonar.tests=test \
             -Dsonar.coverageReportPaths=coverage/cobertura.xml \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
